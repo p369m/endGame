@@ -168,4 +168,112 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken };
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const user = await User.findById(req.user?._id);
+  const isPasswordCorrect = user.isPasswordCorrect(oldPassword);
+  if (!isPasswordCorrect) {
+    throw new apiError(400, "wrong password");
+  }
+  user.password = password;
+  await user.save({ ValidateBeforeSave: false });
+  return res
+    .status(200)
+    .json(new apiResponse(200, {}, "password change success"));
+});
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .json(
+      new apiResponse(
+        200,
+        { user: req.user },
+        "current user fetched successfully"
+      )
+    );
+});
+
+const updateAccountDetails = asyncHandler(async (req, res) => {
+  const { fullname, email } = req.body;
+  if (!(fullname || email)) {
+    throw new apiError(400, "details expected");
+  }
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        fullname,
+        email,
+      },
+    },
+    { new: true }
+  ).select("-password");
+
+  return res
+    .status(200)
+    .json(new apiResponse(200, { user }, "details updated"));
+});
+const updateUserAvatar = asyncHandler(async (req, res) => {
+  const avatarLocalPath = req.file?.path;
+  if (!avatarLocalPath) {
+    throw new apiError(400, "avatar required");
+  }
+  try {
+    const avatar = await uploadOnCloudianary(avatarLocalPath);
+    if (!avatar?.url) {
+      throw new apiError(500, "error while savinging avatar");
+    }
+    const user = await User.findByIdAndUpdate(
+      req.user?._id,
+      {
+        $set: {
+          avatar: avatar.url,
+        },
+      },
+      { new: true }
+    ).select("-password");
+    return res
+      .status(200)
+      .json(new apiResponse(200, { user }, "avatar updated"));
+  } catch (error) {
+    throw new apiError(500, "error while saving avatar");
+  }
+});
+const updateUserCoverImage = asyncHandler(async (req, res) => {
+  const coverImageLocalPath = req.file?.path;
+  if (!coverImageLocalPath) {
+    throw new apiError(400, "cover image required");
+  }
+  try {
+    const coverImage = await uploadOnCloudianary(coverImageLocalPath);
+    if (!coverImage?.url) {
+      throw new apiError(500, "error while saving cover image");
+    }
+    const user = await User.findByIdAndUpdate(
+      req.user?._id,
+      {
+        $set: {
+          coverImage: coverImage.url,
+        },
+      },
+      { new: true }
+    ).select("-password");
+    return res
+      .status(200)
+      .json(new apiResponse(200, { user }, "cover image updated"));
+  } catch (error) {
+    throw new apiError(500, "error while savinging cover image");
+  }
+});
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  refreshAccessToken,
+  changeCurrentPassword,
+  getCurrentUser,
+  updateAccountDetails,
+  updateUserAvatar,
+  updateUserCoverImage,
+};
