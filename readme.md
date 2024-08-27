@@ -1,6 +1,4 @@
-
-
-```
+````markdown
 # endGame
 
 endGame is a Node.js backend API for user management and video streaming functionality. The API provides user authentication, profile management, and video watch history tracking, among other features.
@@ -30,13 +28,16 @@ endGame is a Node.js backend API for user management and video streaming functio
    git clone https://github.com/p369m/endGame.git
    cd endGame
    ```
+````
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
 
 3. Create a `.env` file in the root directory and add the following environment variables:
+
    ```bash
    ACCESS_TOKEN_SECRET=your_access_token_secret
    REFRESH_TOKEN_SECRET=your_refresh_token_secret
@@ -78,10 +79,6 @@ endGame is a Node.js backend API for user management and video streaming functio
 
 - **User**: User schema with methods for password hashing, token generation, and authentication.
 
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
-
 ```
 
-.
+```
